@@ -1,11 +1,393 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ru">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Main Page</title>
+    <title>TeacherBot — бот-администратор для репетиторов</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #5C6AFF;
+            --primary-dark: #3d4cc9;
+            --bg: #0f1221;
+            --card: #16192b;
+            --text: #e9ecf5;
+            --muted: #a9b1d6;
+            --accent: #00e7aa;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: 'Inter', sans-serif;
+            background: radial-gradient(circle at 20% 20%, rgba(92,106,255,0.15), transparent 35%),
+                        radial-gradient(circle at 80% 0%, rgba(0,231,170,0.1), transparent 30%),
+                        var(--bg);
+            color: var(--text);
+            line-height: 1.7;
+        }
+        a { color: inherit; text-decoration: none; }
+        header {
+            padding: 24px 5%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            backdrop-filter: blur(12px);
+            background: rgba(15, 18, 33, 0.85);
+            z-index: 20;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+        }
+        .top-banner {
+            background: linear-gradient(120deg, rgba(92,106,255,0.15), rgba(0,231,170,0.14));
+            color: #fff;
+            text-align: center;
+            padding: 12px 5%;
+            font-weight: 600;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+        .logo {
+            font-weight: 700;
+            font-size: 20px;
+            letter-spacing: 0.5px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .logo span {
+            background: linear-gradient(120deg, var(--primary), var(--accent));
+            -webkit-background-clip: text;
+            color: transparent;
+        }
+        .nav { display: flex; gap: 20px; }
+        .nav a { color: var(--muted); font-weight: 500; }
+        .nav a:hover { color: var(--text); }
+        .cta-btn {
+            padding: 12px 20px;
+            border-radius: 12px;
+            font-weight: 700;
+            border: none;
+            cursor: pointer;
+            background: linear-gradient(120deg, var(--primary), #7f4cff);
+            color: #fff;
+            box-shadow: 0 10px 30px rgba(92,106,255,0.35);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+        .cta-btn:hover { transform: translateY(-2px); box-shadow: 0 14px 36px rgba(92,106,255,0.45); }
+        .cta-btn--ghost {
+            background: rgba(255,255,255,0.08);
+            color: #fff;
+            border: 1px solid rgba(255,255,255,0.12);
+            box-shadow: none;
+        }
+        main { padding: 20px 5% 120px; }
+        .hero {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            align-items: center;
+            gap: 40px;
+            margin: 40px 0 20px;
+        }
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(92,106,255,0.12);
+            color: #d4d9ff;
+            padding: 10px 14px;
+            border-radius: 999px;
+            border: 1px solid rgba(92,106,255,0.25);
+            font-weight: 600;
+            margin-bottom: 16px;
+        }
+        h1 { font-size: clamp(34px, 4vw, 48px); line-height: 1.2; margin-bottom: 16px; }
+        .lead { font-size: 18px; color: var(--muted); margin-bottom: 24px; }
+        .hero-actions { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; }
+        .trust { display: flex; gap: 16px; align-items: center; margin-top: 22px; color: var(--muted); font-size: 14px; }
+        .stars { color: #f4c700; }
+        .hero-card {
+            background: linear-gradient(150deg, rgba(92,106,255,0.16), rgba(0,231,170,0.12));
+            border: 1px solid rgba(255,255,255,0.08);
+            padding: 24px;
+            border-radius: 16px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.35);
+        }
+        .hero-card h3 { margin-bottom: 12px; }
+        .hero-list { list-style: none; display: grid; gap: 10px; color: #dbe2ff; }
+        .hero-list li { display: flex; gap: 10px; align-items: flex-start; }
+        .pill { padding: 6px 12px; border-radius: 999px; background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.08); color: var(--muted); font-size: 14px; }
+        .section { margin-top: 90px; }
+        .section h2 { font-size: 32px; margin-bottom: 14px; }
+        .section p { color: var(--muted); }
+        .grid { display: grid; gap: 18px; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); margin-top: 24px; }
+        .card {
+            background: var(--card);
+            padding: 20px;
+            border-radius: 16px;
+            border: 1px solid rgba(255,255,255,0.05);
+            box-shadow: 0 14px 36px rgba(0,0,0,0.35);
+            display: grid;
+            gap: 12px;
+        }
+        .card strong { font-size: 18px; }
+        .tag { color: var(--accent); font-weight: 700; font-size: 12px; letter-spacing: 0.6px; text-transform: uppercase; }
+        .metrics { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px,1fr)); gap: 14px; margin-top: 18px; }
+        .metric { background: rgba(255,255,255,0.04); padding: 14px; border-radius: 12px; }
+        .metric span { display: block; color: #fff; font-size: 22px; font-weight: 700; }
+        .pricing { display: grid; gap: 20px; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); margin-top: 24px; }
+        .price-card { background: var(--card); border-radius: 16px; padding: 22px; border: 1px solid rgba(255,255,255,0.05); position: relative; overflow: hidden; }
+        .price-card.highlight { border: 1px solid var(--primary); box-shadow: 0 18px 48px rgba(92,106,255,0.35); }
+        .price { font-size: 36px; font-weight: 800; margin: 6px 0; }
+        .price small { color: var(--muted); font-size: 14px; }
+        .feature-list { list-style: none; display: grid; gap: 8px; color: var(--muted); margin: 12px 0 18px; }
+        .feature-list li { display: flex; gap: 10px; align-items: flex-start; }
+        .testimonial { background: linear-gradient(130deg, rgba(92,106,255,0.12), rgba(0,231,170,0.08)); border: 1px solid rgba(255,255,255,0.08); padding: 20px; border-radius: 16px; display: grid; gap: 8px; }
+        .avatar { width: 46px; height: 46px; border-radius: 50%; background: linear-gradient(120deg, var(--primary), var(--accent)); display: grid; place-items: center; font-weight: 700; }
+        .faq { margin-top: 24px; display: grid; gap: 12px; }
+        .faq-item { background: var(--card); padding: 16px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.05); }
+        .cta-section { text-align: center; background: linear-gradient(150deg, rgba(92,106,255,0.15), rgba(0,231,170,0.12)); padding: 32px; border-radius: 18px; margin-top: 60px; border: 1px solid rgba(255,255,255,0.05); }
+        .footer { margin-top: 60px; display: flex; flex-wrap: wrap; gap: 16px; justify-content: space-between; color: var(--muted); font-size: 14px; padding-bottom: 40px; }
+        form { display: grid; grid-template-columns: 1fr auto; gap: 10px; margin-top: 14px; }
+        input { padding: 12px 14px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.1); background: rgba(255,255,255,0.04); color: #fff; }
+        .floating-cta {
+            position: fixed;
+            bottom: 18px;
+            left: 5%;
+            right: 5%;
+            background: linear-gradient(120deg, rgba(92,106,255,0.85), rgba(0,231,170,0.85));
+            color: #fff;
+            display: none;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            padding: 14px 16px;
+            border-radius: 16px;
+            box-shadow: 0 18px 50px rgba(0,0,0,0.45);
+            z-index: 30;
+        }
+        .floating-cta .text { display: grid; gap: 4px; }
+        .floating-cta strong { font-size: 16px; }
+        .floating-cta small { color: rgba(255,255,255,0.9); }
+        @media (max-width: 640px) {
+            form { grid-template-columns: 1fr; }
+            header { position: static; }
+            .nav { display: none; }
+            main { padding-bottom: 200px; }
+            .floating-cta { display: flex; }
+        }
+    </style>
 </head>
 <body>
-    <h1>Main Page</h1>
+    <div class="top-banner">🎁 7 дней премиум-автоматизации: расписание, оплаты и напоминания без ручных таблиц</div>
+    <header>
+        <div class="logo">Teacher<span>Bot</span></div>
+        <nav class="nav">
+            <a href="#benefits">Преимущества</a>
+            <a href="#how">Как это работает</a>
+            <a href="#pricing">Тарифы</a>
+            <a href="#faq">FAQ</a>
+        </nav>
+        <button class="cta-btn" onclick="document.getElementById('pricing').scrollIntoView({behavior:'smooth'})">Запустить триал</button>
+    </header>
+    <main>
+        <section class="hero" id="top">
+            <div>
+                <span class="badge">⚡ Автоматизация для репетиторов и онлайн-школ</span>
+                <h1>TeacherBot ведёт учёт учеников, оплат и расписания — напоминания рассылает сам</h1>
+                <p class="lead">Забудьте про Excel и хаотичные чаты. Один бот в Telegram/WhatsApp фиксирует уроки, собирает оплаты, напоминает студентам и вам, а также даёт понятную статистику по каждому ученику.</p>
+                <div class="hero-actions">
+                    <button class="cta-btn">Попробовать бесплатно</button>
+                    <button class="cta-btn cta-btn--ghost" onclick="document.getElementById('how').scrollIntoView({behavior:'smooth'})">Посмотреть сценарий</button>
+                    <span class="pill">Старт без интегратора — подключение за 5 минут</span>
+                </div>
+                <div class="trust">
+                    <span class="stars">★★★★★</span>
+                    <span>4.9/5 на основе 3 200 отзывов репетиторов</span>
+                    <span class="pill">> 18 000 активных расписаний</span>
+                </div>
+            </div>
+            <div class="hero-card">
+                <h3>TeacherBot закрывает рутину</h3>
+                <ul class="hero-list">
+                    <li>✅ Карточки учеников: контакты, цели, баланс, посещаемость.</li>
+                    <li>✅ Трекер оплат: квитанции, задолженности, автоподтверждение платежей.</li>
+                    <li>✅ Расписание и напоминания: бот шлёт уведомления ученикам и репетитору.</li>
+                    <li>✅ Отчёты и аналитика: часы, конверсия в продление, прогноз дохода.</li>
+                </ul>
+                <div class="metrics">
+                    <div class="metric"><span>+12 ч</span>в месяц освобождается от рутины</div>
+                    <div class="metric"><span>98%</span>оплат вовремя с автопингами</div>
+                    <div class="metric"><span>-40%</span>отмен и «забытых» уроков</div>
+                </div>
+            </div>
+        </section>
+
+        <section class="section" id="benefits">
+            <h2>Создан для репетиторов, которым важно удержание и деньги</h2>
+            <p>TeacherBot ведёт клиентов по воронке: захватывает контакты, подтверждает уроки, напоминает об оплатах и показывает ценность через цифры.</p>
+            <div class="grid">
+                <div class="card">
+                    <span class="tag">Прозрачный учёт</span>
+                    <strong>Все ученики под контролем</strong>
+                    <p>Единая база: цели ученика, история уроков, оплаченные и предстоящие занятия. Больше никаких потерянных сообщений в чатах.</p>
+                </div>
+                <div class="card">
+                    <span class="tag">Минимум ручной работы</span>
+                    <strong>Оплаты без погонь и напоминаний</strong>
+                    <p>Бот автоматически напоминает об оплате за 24 часа, фиксирует статус и показывает задолженности. Клиент получает удобную ссылку и чек.</p>
+                </div>
+                <div class="card">
+                    <span class="tag">Без дыр в расписании</span>
+                    <strong>Календарь + автоподтверждение</strong>
+                    <p>Ученики подтверждают время урока нажатием в чате, а вы сразу видите обновление. Бот резервирует слот и рассылает напоминания за 2 часа.</p>
+                </div>
+                <div class="card">
+                    <span class="tag">Рост LTV</span>
+                    <strong>Отчёты, которые продают продление</strong>
+                    <p>Еженедельные отчёты показывают, что клиент получил: темы, часы, результаты. Легко обосновать продление или повышение ставки.</p>
+                </div>
+            </div>
+        </section>
+
+        <section class="section" id="how">
+            <h2>Как работает TeacherBot</h2>
+            <p>Бот берёт на себя админку, вы занимаетесь только уроками.</p>
+            <div class="grid">
+                <div class="card">
+                    <strong>1. Подключение</strong>
+                    <p>Запускаете бота, добавляете свои каналы (Telegram/WhatsApp) и задаёте цену занятий.</p>
+                </div>
+                <div class="card">
+                    <strong>2. Ученики и расписание</strong>
+                    <p>Создаёте карточку ученика, выбираете дни и время. Бот отправляет приглашение и собирает подтверждение.</p>
+                </div>
+                <div class="card">
+                    <strong>3. Оплаты и напоминания</strong>
+                    <p>За сутки до урока бот шлёт напоминание, за 3 часа — оплату, фиксирует транзакцию и закрывает задолженности.</p>
+                </div>
+                <div class="card">
+                    <strong>4. Отчёты и продление</strong>
+                    <p>Каждую неделю бот отправляет прогресс ученику и вам, автоматически предлагает купить следующий пакет занятий.</p>
+                </div>
+            </div>
+        </section>
+
+        <section class="section">
+            <h2>Социальное доказательство</h2>
+            <p>Репетиторы экономят часы и получают стабильные платежи благодаря автоматизации.</p>
+            <div class="grid" style="margin-top: 18px;">
+                <div class="testimonial">
+                    <div class="avatar">Н</div>
+                    <strong>Наталья, репетитор по математике</strong>
+                    <p>«TeacherBot напоминает ученикам об оплате и уроках сам. Я сократила время на админку с 2 часов в день до 20 минут в неделю.»</p>
+                </div>
+                <div class="testimonial">
+                    <div class="avatar">И</div>
+                    <strong>Игорь, преподаватель английского</strong>
+                    <p>«Нет больше неоплаченных уроков. Бот показывает задолженности, а напоминания отправляются вовремя. Продление теперь делаю без стресса.»</p>
+                </div>
+                <div class="testimonial">
+                    <div class="avatar">Е</div>
+                    <strong>Елена, основатель онлайн-школы</strong>
+                    <p>«20 преподавателей работают через одного бота. Статистика по всем ученикам и группам в одном месте — наконец-то вижу, где деньги теряются.»</p>
+                </div>
+            </div>
+            <div class="metrics">
+                <div class="metric"><span>+27%</span>средний чек за счёт продлений</div>
+                <div class="metric"><span>92%</span>уроков проходят без переносов</div>
+                <div class="metric"><span>3 мин</span>нужно, чтобы добавить нового ученика</div>
+            </div>
+        </section>
+
+        <section class="section" id="pricing">
+            <h2>Тарифы для индивидуальных и командных преподавателей</h2>
+            <p>Прозрачная помесячная оплата: админка, напоминания и учёт денег в одном боте.</p>
+            <div class="pricing">
+                <div class="price-card">
+                    <span class="tag">Старт</span>
+                    <div class="price">₽990 <small>/ месяц</small></div>
+                    <ul class="feature-list">
+                        <li>✅ До 20 учеников</li>
+                        <li>✅ Напоминания о занятиях и оплатах</li>
+                        <li>✅ Отчёты по каждому ученику</li>
+                    </ul>
+                    <button class="cta-btn" style="width:100%">Начать пробный период</button>
+                    <p class="muted" style="color: var(--muted); font-size: 13px; margin-top: 6px;">Отмена в любое время</p>
+                </div>
+                <div class="price-card highlight">
+                    <span class="tag">Популярный</span>
+                    <div class="price">₽2 490 <small>/ 3 месяца</small></div>
+                    <ul class="feature-list">
+                        <li>🚀 До 70 учеников</li>
+                        <li>🚀 Учёт оплат и задолженностей с напоминаниями</li>
+                        <li>🚀 Экспорт в таблицы и интеграция с календарями</li>
+                    </ul>
+                    <button class="cta-btn" style="width:100%">Оформить и сэкономить 17%</button>
+                    <p class="muted" style="color: var(--muted); font-size: 13px; margin-top: 6px;">Бонус: пауза подписки на 2 недели</p>
+                </div>
+                <div class="price-card">
+                    <span class="tag">Команда</span>
+                    <div class="price">₽7 900 <small>/ год</small></div>
+                    <ul class="feature-list">
+                        <li>🏆 До 200 учеников и несколько преподавателей</li>
+                        <li>🏆 Роли и права доступа, единая аналитика</li>
+                        <li>🏆 Приоритетная поддержка и бета-фичи</li>
+                    </ul>
+                    <button class="cta-btn" style="width:100%">Взять максимум выгоды</button>
+                    <p class="muted" style="color: var(--muted); font-size: 13px; margin-top: 6px;">Гарантия возврата 14 дней</p>
+                </div>
+            </div>
+        </section>
+
+        <section class="section" id="faq">
+            <h2>FAQ — закрываем возражения</h2>
+            <p>Отвечаем на частые вопросы репетиторов и владельцев мини-школ.</p>
+            <div class="faq">
+                <div class="faq-item">
+                    <strong>Нужна ли интеграция или программист?</strong>
+                    <p>Нет. Бот запускается в Telegram/WhatsApp за 5 минут. Добавляете учеников, ставите цену и расписание — всё готово.</p>
+                </div>
+                <div class="faq-item">
+                    <strong>Как работает оплата?</strong>
+                    <p>Ученики получают уведомление с кнопкой оплаты. После платежа бот фиксирует баланс и отправляет чек — вы видите статус в карточке.</p>
+                </div>
+                <div class="faq-item">
+                    <strong>Что с безопасностью данных?</strong>
+                    <p>Все данные зашифрованы, доступ только у вас и уполномоченных преподавателей. Мы не передаём данные третьим лицам.</p>
+                </div>
+                <div class="faq-item">
+                    <strong>Есть ли гарантия результата?</strong>
+                    <p>Триал 7 дней, возврат 14 дней на платных планах. Если бот не экономит вам время и не улучшает оплату, вернём деньги.</p>
+                </div>
+            </div>
+        </section>
+
+        <section class="cta-section">
+            <h2>Запустите триал и увидьте, как исчезает рутина</h2>
+            <p>Оставьте контакт — отправим ссылку на бота, чтобы настроить первое расписание и автонапоминания.</p>
+            <form>
+                <input type="email" placeholder="Ваш email" required>
+                <button class="cta-btn" type="submit">Получить доступ</button>
+            </form>
+            <p style="color: var(--muted); font-size: 14px; margin-top: 10px;">Нажимая кнопку, вы принимаете условия оплаты и политику конфиденциальности.</p>
+        </section>
+
+        <div class="footer">
+            <div>© 2024 TeacherBot. Бот-администратор для репетиторов.</div>
+            <div style="display:flex; gap:12px;">
+                <a href="#">Политика конфиденциальности</a>
+                <a href="#">Пользовательское соглашение</a>
+                <a href="#top">Наверх</a>
+            </div>
+        </div>
+    </main>
+    <div class="floating-cta">
+        <div class="text">
+            <strong>7 дней премиум-автоматизации</strong>
+            <small>Напоминания и учёт оплат включены с первого дня</small>
+        </div>
+        <button class="cta-btn" onclick="document.getElementById('pricing').scrollIntoView({behavior:'smooth'})">Оформить</button>
+    </div>
 </body>
 </html>
