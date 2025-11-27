@@ -1,0 +1,439 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="TeacherBot — бот-администратор для репетиторов: ведите учёт учеников, оплат, расписания и автоматические напоминания об уроках без ручной рутины.">
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="TeacherBot — бот-администратор для репетиторов">
+    <meta property="og:description" content="Учёт учеников, уроков и оплат с автоматическими напоминаниями для репетиторов и онлайн-школ.">
+    <meta property="og:image" content="https://teacherbot.example/og-preview.png">
+    <title>TeacherBot — бот-администратор для репетиторов</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #5C6AFF;
+            --primary-dark: #3d4cc9;
+            --bg: #0f1221;
+            --card: #16192b;
+            --text: #e9ecf5;
+            --muted: #a9b1d6;
+            --accent: #00e7aa;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        html { scroll-behavior: smooth; }
+        body {
+            font-family: 'Inter', sans-serif;
+            background: radial-gradient(circle at 20% 20%, rgba(92,106,255,0.15), transparent 35%),
+                        radial-gradient(circle at 80% 0%, rgba(0,231,170,0.1), transparent 30%),
+                        var(--bg);
+            color: var(--text);
+            line-height: 1.7;
+            min-width: 430px;
+        }
+        a { color: inherit; text-decoration: none; }
+        header {
+            padding: 24px 5%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            backdrop-filter: blur(12px);
+            background: rgba(15, 18, 33, 0.85);
+            z-index: 20;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+        }
+        .top-banner {
+            background: linear-gradient(120deg, rgba(92,106,255,0.15), rgba(0,231,170,0.14));
+            color: #fff;
+            text-align: center;
+            padding: 12px 5%;
+            font-weight: 600;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+        .logo {
+            font-weight: 700;
+            font-size: 20px;
+            letter-spacing: 0.5px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .logo span {
+            background: linear-gradient(120deg, var(--primary), var(--accent));
+            -webkit-background-clip: text;
+            color: transparent;
+        }
+        .nav { display: flex; gap: 20px; }
+        .nav a { color: var(--muted); font-weight: 500; }
+        .nav a:hover { color: var(--text); }
+        .cta-btn {
+            padding: 12px 20px;
+            border-radius: 12px;
+            font-weight: 700;
+            border: none;
+            background: linear-gradient(120deg, var(--primary), #7f4cff);
+            color: #fff;
+            box-shadow: 0 10px 30px rgba(92,106,255,0.35);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            text-decoration: none;
+            cursor: pointer;
+        }
+        .cta-btn:hover { transform: translateY(-2px); box-shadow: 0 14px 36px rgba(92,106,255,0.45); }
+        .cta-btn--ghost {
+            background: rgba(255,255,255,0.08);
+            color: #fff;
+            border: 1px solid rgba(255,255,255,0.12);
+            box-shadow: none;
+        }
+        main { padding: 20px 5% 120px; }
+        .hero {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            align-items: center;
+            gap: 40px;
+            margin: 40px 0 20px;
+        }
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            flex-wrap: wrap;
+            background: rgba(92,106,255,0.12);
+            color: #d4d9ff;
+            padding: 10px 14px;
+            border-radius: 999px;
+            border: 1px solid rgba(92,106,255,0.25);
+            font-weight: 600;
+            margin-bottom: 16px;
+            text-align: center;
+        }
+        h1 { font-size: clamp(34px, 4vw, 48px); line-height: 1.2; margin-bottom: 16px; }
+        .lead { font-size: 18px; color: var(--muted); margin-bottom: 24px; }
+        .hero-actions { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; }
+        .trust { display: flex; gap: 16px; align-items: center; margin-top: 22px; color: var(--muted); font-size: 14px; flex-wrap: wrap; }
+        .stars { color: #f4c700; }
+        .hero-card {
+            background: linear-gradient(150deg, rgba(92,106,255,0.16), rgba(0,231,170,0.12));
+            border: 1px solid rgba(255,255,255,0.08);
+            padding: 24px;
+            border-radius: 16px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.35);
+        }
+        .hero-card h3 { margin-bottom: 12px; }
+        .hero-list { list-style: none; display: grid; gap: 10px; color: #dbe2ff; }
+        .hero-list li { display: flex; gap: 10px; align-items: flex-start; }
+        .pill { padding: 6px 12px; border-radius: 999px; background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.08); color: var(--muted); font-size: 14px; }
+        .section { margin-top: 90px; scroll-margin-top: 110px; }
+        .section h2 { font-size: 32px; margin-bottom: 14px; }
+        .section p { color: var(--muted); }
+        .grid { display: grid; gap: 18px; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); margin-top: 24px; }
+        .card {
+            background: var(--card);
+            padding: 20px;
+            border-radius: 16px;
+            border: 1px solid rgba(255,255,255,0.05);
+            box-shadow: 0 14px 36px rgba(0,0,0,0.35);
+            display: grid;
+            gap: 12px;
+        }
+        .card strong { font-size: 18px; }
+        .tag { color: var(--accent); font-weight: 700; font-size: 12px; letter-spacing: 0.6px; text-transform: uppercase; }
+        .metrics { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px,1fr)); gap: 14px; margin-top: 18px; }
+        .metric { background: rgba(255,255,255,0.04); padding: 14px; border-radius: 12px; }
+        .metric span { display: block; color: #fff; font-size: 22px; font-weight: 700; }
+        .pricing { display: grid; gap: 20px; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); margin-top: 24px; }
+        .price-card { background: var(--card); border-radius: 16px; padding: 22px; border: 1px solid rgba(255,255,255,0.05); position: relative; overflow: hidden; }
+        .price-card.highlight { border: 1px solid var(--primary); box-shadow: 0 18px 48px rgba(92,106,255,0.35); }
+        .price { font-size: 36px; font-weight: 800; margin: 6px 0; }
+        .price small { color: var(--muted); font-size: 14px; }
+        .feature-list { list-style: none; display: grid; gap: 8px; color: var(--muted); margin: 12px 0 18px; }
+        .feature-list li { display: flex; gap: 10px; align-items: flex-start; }
+        .testimonial { background: linear-gradient(130deg, rgba(92,106,255,0.12), rgba(0,231,170,0.08)); border: 1px solid rgba(255,255,255,0.08); padding: 20px; border-radius: 16px; display: grid; gap: 8px; }
+        .avatar { width: 46px; height: 46px; border-radius: 50%; background: linear-gradient(120deg, var(--primary), var(--accent)); display: grid; place-items: center; font-weight: 700; }
+        .faq { margin-top: 24px; display: grid; gap: 12px; }
+        .faq-item { background: var(--card); padding: 16px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.05); }
+        .cta-section { text-align: center; background: linear-gradient(150deg, rgba(92,106,255,0.15), rgba(0,231,170,0.12)); padding: 32px; border-radius: 18px; margin-top: 60px; border: 1px solid rgba(255,255,255,0.05); }
+        .footer { margin-top: 60px; display: flex; flex-wrap: wrap; gap: 16px; justify-content: space-between; color: var(--muted); font-size: 14px; padding-bottom: 40px; }
+        form { display: grid; grid-template-columns: 1fr auto; gap: 10px; margin-top: 14px; }
+        input { padding: 12px 14px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.1); background: rgba(255,255,255,0.04); color: #fff; }
+        .floating-cta {
+            position: fixed;
+            bottom: 18px;
+            left: 5%;
+            right: 5%;
+            background: linear-gradient(120deg, rgba(92,106,255,0.85), rgba(0,231,170,0.85));
+            color: #fff;
+            display: none;
+            padding: 16px 18px;
+            border-radius: 16px;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 14px 40px rgba(0,0,0,0.35);
+            z-index: 99;
+        }
+        .floating-cta button { box-shadow: none; }
+        @media (max-width: 720px) {
+            .nav { display: none; }
+            form { grid-template-columns: 1fr; }
+            header { position: sticky; }
+            .floating-cta { display: flex; }
+            main { padding-bottom: 160px; }
+        }
+
+        @media (max-width: 540px) {
+            header { padding: 20px 4%; }
+            main { padding: 16px 4% 150px; }
+            .hero { gap: 24px; margin: 28px 0 12px; }
+            h1 { font-size: clamp(28px, 8vw, 34px); }
+            .lead { font-size: 16px; }
+            .hero-actions { flex-direction: column; align-items: stretch; }
+            .hero-actions .cta-btn, .hero-actions .cta-btn--ghost { width: 100%; text-align: center; }
+            .pill { width: 100%; text-align: center; }
+            .hero-card { padding: 18px; }
+            .section { margin-top: 64px; }
+            .section h2 { font-size: 26px; }
+            .card, .price-card, .testimonial, .faq-item { padding: 18px; }
+            .cta-section { padding: 24px; }
+            .pricing, .grid, .metrics { gap: 14px; }
+            .footer { flex-direction: column; align-items: flex-start; gap: 10px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="top-banner">⚡ 7 дней премиум-доступа бесплатно — стартуйте без интеграторов и долгих настроек</div>
+    <header>
+        <div class="logo">TeacherBot <span>для репетиторов</span></div>
+        <nav class="nav">
+            <a href="#benefits">Возможности</a>
+            <a href="#flow">Как работает</a>
+            <a href="#pricing">Тарифы</a>
+            <a href="#faq">FAQ</a>
+        </nav>
+        <a class="cta-btn" href="#cta" data-scroll>Попробовать бесплатно</a>
+    </header>
+
+    <main>
+        <section class="hero">
+            <div>
+                <div class="badge">Полный учёт учеников, оплат и расписания в одном боте</div>
+                <h1>TeacherBot снимает рутину с репетитора: ведёт карточки учеников, считает оплаты и напоминает о занятиях</h1>
+                <p class="lead">Фиксируйте все уроки и платежи, стройте расписание, а автоматические напоминания предупредят учеников и вас об уроке и оплате. Больше времени на преподавание, меньше на админку.</p>
+                <div class="hero-actions">
+                    <a class="cta-btn" href="#cta" data-scroll>Запустить 7-дневный триал</a>
+                    <a class="cta-btn cta-btn--ghost" href="#flow" data-scroll>Посмотреть демо</a>
+                    <span class="pill">Без карт и интеграторов</span>
+                </div>
+                <div class="trust">
+                    <span class="stars">★★★★★</span>
+                    <span>1 200+ репетиторов уже ведут учёт через TeacherBot</span>
+                </div>
+            </div>
+            <div class="hero-card">
+                <h3>Что автоматизирует бот:</h3>
+                <ul class="hero-list">
+                    <li>✅ Карточки учеников с контактами, предметами и целями</li>
+                    <li>✅ Учёт оплат за занятия, абонементы и задолженности</li>
+                    <li>✅ Расписание уроков с подтверждением через мессенджер</li>
+                    <li>✅ Напоминания ученикам и репетиторам о занятиях и платежах</li>
+                    <li>✅ Статистика по выручке, посещаемости и LTV</li>
+                </ul>
+            </div>
+        </section>
+
+        <section id="benefits" class="section">
+            <h2>Почему репетиторы выбирают TeacherBot</h2>
+            <p>Бот закрывает ключевые узкие места: забытые оплаты, срывы уроков и отсутствие единой базы учеников.</p>
+            <div class="grid">
+                <div class="card">
+                    <div class="tag">Учёт оплат</div>
+                    <strong>Видно, кто оплатил и когда</strong>
+                    <p>Фиксируйте каждый платеж, выставляйте счета за уроки или пакеты, получайте напоминания о просрочках.</p>
+                </div>
+                <div class="card">
+                    <div class="tag">Расписание</div>
+                    <strong>Уроки в календаре и чате</strong>
+                    <p>Создавайте расписание, меняйте слоты в пару кликов, а бот отправит уведомления о переносах всем участникам.</p>
+                </div>
+                <div class="card">
+                    <div class="tag">Клиентский сервис</div>
+                    <strong>Напоминания ученикам</strong>
+                    <p>Ученики подтверждают или переносят занятия прямо в боте, получают напоминания об оплатах и чек-листы к уроку.</p>
+                </div>
+                <div class="card">
+                    <div class="tag">Статистика</div>
+                    <strong>Выручка и прогресс в цифрах</strong>
+                    <p>Отслеживайте LTV, посещаемость и средний чек по каждому ученику или группе, чтобы вовремя удержать клиента.</p>
+                </div>
+            </div>
+            <div class="metrics">
+                <div class="metric"><span>−30%</span> меньше сорванных уроков за счёт напоминаний</div>
+                <div class="metric"><span>+18%</span> средний LTV ученика</div>
+                <div class="metric"><span>2 часа</span> экономии в неделю на админке</div>
+            </div>
+        </section>
+
+        <section id="flow" class="section">
+            <h2>Как работает TeacherBot для репетитора</h2>
+            <p>От первого ученика до полной аналитики — всё в одном сценарии.</p>
+            <div class="grid">
+                <div class="card">
+                    <div class="tag">Шаг 1</div>
+                    <strong>Создайте карточки учеников</strong>
+                    <p>Импортируйте контакты, предмет, цели и тариф. Бот хранит историю занятий и оплат.</p>
+                </div>
+                <div class="card">
+                    <div class="tag">Шаг 2</div>
+                    <strong>Соберите расписание</strong>
+                    <p>Поставьте уроки в календарь, добавьте ссылки на Zoom/Telegram. Уведомления уходят обоим.</p>
+                </div>
+                <div class="card">
+                    <div class="tag">Шаг 3</div>
+                    <strong>Принимайте оплаты</strong>
+                    <p>Отмечайте платежи, настраивайте напоминания о задолженностях. Бот сообщает о каждом платеже.</p>
+                </div>
+                <div class="card">
+                    <div class="tag">Шаг 4</div>
+                    <strong>Смотрите аналитику</strong>
+                    <p>Понимайте выручку по предметам, загруженность по дням и эффективность пакетов занятий.</p>
+                </div>
+            </div>
+        </section>
+
+        <section class="section">
+            <h2>Соцдоказательство</h2>
+            <p>Что говорят репетиторы и администраторы онлайн-школ.</p>
+            <div class="grid">
+                <div class="testimonial">
+                    <div class="avatar">А</div>
+                    <strong>Анна, английский, 32 ученика</strong>
+                    <p>«Раньше теряла оплаты и путалась в расписании. Теперь бот напоминает о каждом уроке и платеже — фокусируюсь на методике, а не на таблицах.»</p>
+                </div>
+                <div class="testimonial">
+                    <div class="avatar">Д</div>
+                    <strong>Дмитрий, математика, онлайн-школа</strong>
+                    <p>«Админка в чат-боте закрыла контроль посещаемости и удержание. Просрочки почти исчезли, LTV вырос на 20%.»</p>
+                </div>
+                <div class="testimonial">
+                    <div class="avatar">Е</div>
+                    <strong>Екатерина, подготовка к ЕГЭ</strong>
+                    <p>«Уведомления ученикам экономят время. За неделю внедрения освободилось два часа — трачу их на новые уроки.»</p>
+                </div>
+            </div>
+        </section>
+
+        <section id="pricing" class="section">
+            <h2>Тарифы для репетиторов и мини-команд</h2>
+            <p>Начните бесплатно и выберите тариф, который окупится за пару уроков.</p>
+            <div class="pricing">
+                <div class="price-card">
+                    <div class="tag">Старт</div>
+                    <div class="price">0 ₽<small>/7 дней</small></div>
+                    <p>Полный функционал на тест, без карты и интеграторов.</p>
+                    <ul class="feature-list">
+                        <li>✅ До 15 учеников</li>
+                        <li>✅ Расписание и напоминания</li>
+                        <li>✅ Учёт оплат и задолженностей</li>
+                        <li>✅ Базовая аналитика</li>
+                    </ul>
+                    <a class="cta-btn cta-btn--ghost" href="#cta" data-scroll>Запустить триал</a>
+                </div>
+                <div class="price-card highlight">
+                    <div class="tag">Профи</div>
+                    <div class="price">990 ₽<small>/мес</small></div>
+                    <p>Для репетиторов с постоянным потоком учеников.</p>
+                    <ul class="feature-list">
+                        <li>✅ Безлимит учеников</li>
+                        <li>✅ Абонементы и напоминания об оплатах</li>
+                        <li>✅ Подтверждение и перенос уроков в чате</li>
+                        <li>✅ Подробная аналитика и отчёты</li>
+                    </ul>
+                    <a class="cta-btn" href="#cta" data-scroll>Попробовать 7 дней</a>
+                </div>
+                <div class="price-card">
+                    <div class="tag">Команда</div>
+                    <div class="price">2 900 ₽<small>/мес</small></div>
+                    <p>Для мини-школ с несколькими преподавателями.</p>
+                    <ul class="feature-list">
+                        <li>✅ До 5 преподавателей</li>
+                        <li>✅ Единая база учеников и оплат</li>
+                        <li>✅ Роли и доступы для администраторов</li>
+                        <li>✅ Приоритетная поддержка</li>
+                    </ul>
+                    <a class="cta-btn cta-btn--ghost" href="#cta" data-scroll>Демо для команды</a>
+                </div>
+            </div>
+        </section>
+
+        <section id="faq" class="section">
+            <h2>FAQ</h2>
+            <div class="faq">
+                <div class="faq-item">
+                    <strong>Нужно ли подключать платежные системы?</strong>
+                    <p>Нет. Вы отмечаете оплаты вручную или передаёте ссылку на перевод — бот фиксирует факт и напоминает о задолженностях.</p>
+                </div>
+                <div class="faq-item">
+                    <strong>Как ученики получают напоминания?</strong>
+                    <p>Через бот в мессенджере: уведомления о занятиях, оплате, переносах. Репетитор получает копию, чтобы ничего не потерялось.</p>
+                </div>
+                <div class="faq-item">
+                    <strong>Можно ли вести группы?</strong>
+                    <p>Да, создавайте групповые уроки, отмечайте оплату и посещаемость каждого ученика, отслеживайте статистику по группе.</p>
+                </div>
+                <div class="faq-item">
+                    <strong>Как быстро стартовать?</strong>
+                    <p>Регистрация и запуск занимают 5 минут: добавляете учеников, ставите расписание и сразу получаете напоминания.</p>
+                </div>
+            </div>
+        </section>
+
+        <section id="cta" class="cta-section">
+            <h2>Попробуйте TeacherBot сейчас</h2>
+            <p>Снимите с себя учёт оплат, расписание и напоминания — бот сделает это за вас.</p>
+            <form action="https://t.me/TeacherBot" method="get" target="_blank">
+                <input id="cta-email" type="email" name="email" placeholder="Ваш email для доступа" aria-label="Email">
+                <button class="cta-btn" type="submit">Получить доступ</button>
+            </form>
+            <p class="pill" style="margin: 14px auto 0; display: inline-flex;">7 дней бесплатно, без привязки карты</p>
+        </section>
+
+        <div class="floating-cta">
+            <div>
+                <strong>TeacherBot для репетиторов</strong>
+                <p style="color:#e9ecf5; font-size:14px; margin-top:4px;">Напоминания об уроках и оплатах + учёт учеников</p>
+            </div>
+            <a class="cta-btn" href="#cta" data-scroll>Запустить триал</a>
+        </div>
+    </main>
+
+    <footer class="footer">
+        <span>© 2024 TeacherBot</span>
+        <div style="display:flex; gap:14px;">
+            <a href="#">Политика конфиденциальности</a>
+            <a href="#">Поддержка</a>
+        </div>
+    </footer>
+    <script>
+        const focusTarget = document.getElementById('cta-email');
+        document.querySelectorAll('[data-scroll]').forEach((link) => {
+            link.addEventListener('click', (event) => {
+                const targetId = link.getAttribute('href');
+                if (!targetId || !targetId.startsWith('#')) return;
+                const section = document.querySelector(targetId);
+                if (!section) return;
+                event.preventDefault();
+                section.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                if (targetId === '#cta' && focusTarget) {
+                    focusTarget.focus({ preventScroll: true });
+                }
+            });
+        });
+    </script>
+</body>
+</html>
